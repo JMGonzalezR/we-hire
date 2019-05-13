@@ -87,6 +87,30 @@ class App extends React.Component {
     this.setState({ open: false });
   };
 
+  componentDidMount(){
+
+    //TODO: make this with a login UI
+    if(!window.localStorage.getItem('token')){
+      fetch('http://wordpress-react-test.randomstudiosrd.com/wp-json/jwt-auth/v1/token',{
+        method: "POST",
+        headers:{
+            'Content-Type': 'application/json',
+            'accept': 'application/json',
+        },
+        body:JSON.stringify({
+            username: 'jgonzalez',
+            password: 'J23111993'
+        })
+        }).then(function(response){
+            return response.json();
+        }).then(function(user){
+            window.localStorage.setItem('token', user.token)
+            console.log(user.token);
+        });
+    }
+    
+  }
+
   render() {
     const { classes } = this.props;
 

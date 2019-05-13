@@ -31,6 +31,11 @@ const styles = theme => ({
 class CandidateForm extends React.Component {
   state = {
     open: false,
+    name: '',
+    last_name: '',
+    email: '',
+    phone_number: '',
+    position: ''
   };
 
   handleClickOpen = () => {
@@ -44,6 +49,10 @@ class CandidateForm extends React.Component {
   handleChange = name => event => {
     this.setState({ [name]: event.target.value });
   };
+
+  onSubmit = () => {
+
+  }
 
   render() {
     const {classes} = this.props;
