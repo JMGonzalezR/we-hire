@@ -11,6 +11,12 @@ import Badge from '@material-ui/core/Badge';
 import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import LeftPanel from './containers/leftPanel';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch
+} from "react-router-dom";
+import HomePage from './pages/home/homePage';
 
 
 
@@ -122,15 +128,11 @@ class App extends React.Component {
         
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
-          <Typography variant="h4" gutterBottom component="h2">
-            Orders
-          </Typography>
-          <Typography component="div" className={classes.chartContainer}>
-            
-          </Typography>
-          <Typography variant="h4" gutterBottom component="h2">
-            Products
-          </Typography>
+          <Router>
+            <Switch>
+              <Route path="/" exact component={HomePage} />
+            </Switch>
+          </Router>
           <div className={classes.tableContainer}>
             
           </div>
