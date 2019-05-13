@@ -9,7 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
 import EnhancedTableHead from '../../components/EnhancedTableHead';
 import EnhancedTableToolbar from '../../components/EnhancedTableToolbar';
-
+import CandidateForm from './candidatesForm';
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -139,7 +139,9 @@ class CandidatesGrid extends React.Component {
    console.log(data);
     return (
       <Paper className={classes.root}>
+        
         <EnhancedTableToolbar numSelected={selected.length} title="Candidates" />
+        <CandidateForm/>
         <div className={classes.tableWrapper}>
           <Table className={classes.table} aria-labelledby="tableTitle">
             <EnhancedTableHead
