@@ -17,6 +17,7 @@ import {
   Switch
 } from "react-router-dom";
 import HomePage from './pages/home/homePage';
+import InterviewsGrid from './pages/interviews/interviewsGrid';
 
 
 
@@ -123,20 +124,22 @@ class App extends React.Component {
             </IconButton>
           </Toolbar>
         </AppBar>
-
-        <LeftPanel open={this.state.open} handleDrawerClose={this.handleDrawerClose}/>
-        
-        <main className={classes.content}>
-          <div className={classes.appBarSpacer} />
-          <Router>
-            <Switch>
-              <Route path="/" exact component={HomePage} />
-            </Switch>
-          </Router>
-          <div className={classes.tableContainer}>
+        <Router>
+          <LeftPanel open={this.state.open} handleDrawerClose={this.handleDrawerClose}/>
+          
+          <main className={classes.content}>
+            <div className={classes.appBarSpacer} />
             
-          </div>
-        </main>
+              <Switch>
+                <Route path="/" exact component={HomePage} />
+                <Route path="/interviews" exact component={InterviewsGrid} />
+              </Switch>
+            
+            <div className={classes.tableContainer}>
+              
+            </div>
+          </main>
+        </Router>
       </div>
     );
   }

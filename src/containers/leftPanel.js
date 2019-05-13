@@ -10,6 +10,7 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
+import {Link} from 'react-router-dom'; 
 
 const drawerWidth = 240;
 
@@ -87,7 +88,14 @@ class LeftPanel extends React.Component {
               <ListItemIcon>
                 <DashboardIcon />
               </ListItemIcon>
-              <ListItemText primary="Dashboard" />
+              <Link to="/"><ListItemText primary="Dashboard" /></Link>
+            </ListItem>
+            <ListItem button>
+              <ListItemIcon>
+                <DashboardIcon />
+              </ListItemIcon>
+              <Link to="/interviews"><ListItemText primary="Interviews" /></Link>
+              
             </ListItem>
           </List>
           <Divider />
