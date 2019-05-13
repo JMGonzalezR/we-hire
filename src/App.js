@@ -18,6 +18,7 @@ import {
 } from "react-router-dom";
 import HomePage from './pages/home/homePage';
 import InterviewsGrid from './pages/interviews/interviewsGrid';
+import CandidatesGrid from './pages/candidates/candidatesGrid';
 
 
 
@@ -133,6 +134,7 @@ class App extends React.Component {
               <Switch>
                 <Route path="/" exact component={HomePage} />
                 <Route path="/interviews" exact component={InterviewsGrid} />
+                <Route path="/candidates" exact component={CandidatesGrid} />
               </Switch>
             
             <div className={classes.tableContainer}>

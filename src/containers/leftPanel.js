@@ -62,10 +62,6 @@ class LeftPanel extends React.Component {
         return null;
     }
 
-    /*handleDrawerClose = () => {
-        this.setState({ open: false });
-    };*/
-
     render() {
         console.log(this.state.open)
         const { classes } = this.props;
@@ -95,7 +91,12 @@ class LeftPanel extends React.Component {
                 <DashboardIcon />
               </ListItemIcon>
               <Link to="/interviews"><ListItemText primary="Interviews" /></Link>
-              
+            </ListItem>
+            <ListItem button>
+              <ListItemIcon>
+                <DashboardIcon />
+              </ListItemIcon>
+              <Link to="/candidates"><ListItemText primary="Candidates" /></Link>
             </ListItem>
           </List>
           <Divider />
