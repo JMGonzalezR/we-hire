@@ -9,12 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
 import EnhancedTableHead from '../../components/EnhancedTableHead';
 import EnhancedTableToolbar from '../../components/EnhancedTableToolbar';
-
-let counter = 0;
-function createData(interviewer, candidate, date, meetingLink, challengeLink, rate, comments, status) {
-  counter += 1;
-  return { id: counter, interviewer, candidate, date, meetingLink, challengeLink, rate, comments, status };
-}
+import InterviewsForm from './interviewsForm';
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -44,8 +39,8 @@ const rows = [
   { id: 'interviewer', numeric: false, disablePadding: true, label: 'Interviewer' },
   { id: 'candidate', numeric: false, disablePadding: false, label: 'Candidate' },
   { id: 'date', numeric: false, disablePadding: false, label: 'Date' },
-  { id: 'meetingLink', numeric: false, disablePadding: false, label: 'Meeting Link' },
-  { id: 'challengeLink', numeric: false, disablePadding: false, label: 'Challenge Link' },
+  { id: 'meeting_link', numeric: false, disablePadding: false, label: 'Meeting Link' },
+  { id: 'challenge_link', numeric: false, disablePadding: false, label: 'Challenge Link' },
   { id: 'rate', numeric: false, disablePadding: false, label: 'Rate' },
   { id: 'comments', numeric: false, disablePadding: false, label: 'Comments' },
   { id: 'status', numeric: false, disablePadding: false, label: 'Status' },
@@ -66,21 +61,35 @@ const styles = theme => ({
   },
 });
 
-class InterviewsGrid extends React.Component {
+class CandidatesGrid extends React.Component {
+
+
   state = {
     order: 'asc',
-    orderBy: 'interviewer',
+    orderBy: 'name',
     selected: [],
-    data: [
-      createData('Gerald Canario', 'Juan Gonzalez' , new Date(), "meetinglink.com", "challengelink.com", "20-25", "React Developer", "Scheduled"),
-      createData('Cristophe', 'Andrea' , new Date(), "meetinglink.com", "challengelink.com", "10-15", "Python Developer", "Scheduled"),
-      createData('Franchesca', 'Manuel' , new Date(), "meetinglink.com", "challengelink.com", "15-20", "Wordpress Developer", "Scheduled"),
-      createData('Michael', 'Jose' , new Date(), "meetinglink.com", "challengelink.com", "20-25", "Angular Developer", "Scheduled"),
-      createData('Tim', 'Dionys' , new Date(), "meetinglink.com", "challengelink.com", "20-25", "React Developer", "Scheduled")
-    ],
+    data: [],
     page: 0,
     rowsPerPage: 5,
+    dataSelected:{},
+    openForm: false
   };
+
+  componentDidMount(){
+    this.fetchCandidates();
+  }
+
+  fetchCandidates = () => {
+    let dataURL = "http://wordpress-react-test.randomstudiosrd.com/wp-json/acf/v3/interviews"  
+    fetch(dataURL)
+        .then(res => res.json())
+        .then(res => {
+            console.log(res);
+            this.setState({
+                data:res
+            })
+        })
+  }
 
   handleRequestSort = (event, property) => {
     const orderBy = property;
@@ -101,25 +110,22 @@ class InterviewsGrid extends React.Component {
     this.setState({ selected: [] });
   };
 
-  handleClick = (event, id) => {
-    const { selected } = this.state;
+  handleClick = (event, id, data) => {
+    const { selected, dataSelected } = this.state;
     const selectedIndex = selected.indexOf(id);
     let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
+    let newDataSelected = {};
+    //If you click in the row selected, it will remove it from selected
+    if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
+    } 
+    else newSelected = [id];
+
+    if(dataSelected !== data){
+        newDataSelected = data;
     }
 
-    this.setState({ selected: newSelected });
+    this.setState({ selected: newSelected, dataSelected: newDataSelected });
   };
 
   handleChangePage = (event, page) => {
@@ -132,14 +138,51 @@ class InterviewsGrid extends React.Component {
 
   isSelected = id => this.state.selected.indexOf(id) !== -1;
 
+  onDelete = () =>{
+    let token = window.localStorage.getItem("token");
+    let id = this.state.selected[0];
+    let me = this;
+    fetch('http://wordpress-react-test.randomstudiosrd.com/wp-json/wp/v2/interviews/'+id ,{
+        method: "DELETE",
+        headers:{
+            'Content-Type': 'application/json',
+            'accept': 'application/json',
+            'Authorization': 'Bearer '+token
+        },
+        body: JSON.stringify({
+            id
+        })
+    }).then(function(response){
+        return response.json();
+    }).then(function(post){
+        console.log(post);
+        me.setState({ 
+            selected:[]
+            })
+        me.fetchCandidates();
+    }).catch(function(error){
+        console.log(error.message)
+    })
+  }
+
+  onEdit = () =>{
+        this.setState({openForm:true})
+  }
+
+  onCloseForm = () =>{
+    this.setState({openForm:false, selected:[], dataSelected:{}})
+  }
+
   render() {
     const { classes } = this.props;
-    const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
+    const { data, order, orderBy, selected, rowsPerPage, page, openForm } = this.state;
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
-   console.log(data);
+    const id = selected[0];
     return (
       <Paper className={classes.root}>
-        <EnhancedTableToolbar numSelected={selected.length} title="Interviews" />
+        
+        <EnhancedTableToolbar numSelected={selected.length} title="Interviews" onDelete={this.onDelete} onEdit={this.onEdit} />
+        <InterviewsForm fetchCandidates={this.fetchCandidates} candidate={this.state.dataSelected} onOpenForm={this.onEdit} openForm={openForm} candidateId={id} onCloseForm={this.onCloseForm}/>
         <div className={classes.tableWrapper}>
           <Table className={classes.table} aria-labelledby="tableTitle">
             <EnhancedTableHead
@@ -159,7 +202,7 @@ class InterviewsGrid extends React.Component {
                   return (
                     <TableRow
                       hover
-                      onClick={event => this.handleClick(event, n.id)}
+                      onClick={event => this.handleClick(event, n.id, n.acf)}
                       role="checkbox"
                       aria-checked={isSelected}
                       tabIndex={-1}
@@ -170,15 +213,15 @@ class InterviewsGrid extends React.Component {
                         <Checkbox checked={isSelected} />
                       </TableCell>
                       <TableCell component="th" scope="row" padding="none">
-                        {n.interviewer}
+                        {n.acf.interviewer}
                       </TableCell>
-                      <TableCell align="right">{n.candidate}</TableCell>
-                      <TableCell align="right">{n.date.toDateString()}</TableCell>
-                      <TableCell align="right">{n.meetingLink}</TableCell>
-                      <TableCell align="right">{n.challengeLink}</TableCell>
-                      <TableCell align="right">{n.rate}</TableCell>
-                      <TableCell align="right">{n.comments}</TableCell>
-                      <TableCell align="right">{n.status}</TableCell>
+                      <TableCell >{n.acf.candidate}</TableCell>
+                      <TableCell >{n.acf.date}</TableCell>
+                      <TableCell >{n.acf.meeting_link}</TableCell>
+                      <TableCell >{n.acf.challenge_link}</TableCell>
+                      <TableCell >{n.acf.rate}</TableCell>
+                      <TableCell >{n.acf.comments}</TableCell>
+                      <TableCell >{n.acf.status}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -209,4 +252,4 @@ class InterviewsGrid extends React.Component {
     );
   }
 }
-export default withStyles(styles)(InterviewsGrid);
+export default withStyles(styles)(CandidatesGrid);
