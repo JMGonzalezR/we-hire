@@ -63,7 +63,7 @@ class CandidatesGrid extends React.Component {
 
   state = {
     order: 'asc',
-    orderBy: 'interviewer',
+    orderBy: 'name',
     selected: [],
     data: [],
     page: 0,

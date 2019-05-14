@@ -19,6 +19,7 @@ import {
 import HomePage from './pages/home/homePage';
 import InterviewsGrid from './pages/interviews/interviewsGrid';
 import CandidatesGrid from './pages/candidates/candidatesGrid';
+import InterviewersGrid from './pages/interviewers/interviewersGrid';
 
 
 
@@ -90,6 +91,7 @@ class App extends React.Component {
   componentDidMount(){
 
     //TODO: make this with a login UI
+    //jwt auth, generate token for the requests
     if(!window.localStorage.getItem('token')){
       fetch('http://wordpress-react-test.randomstudiosrd.com/wp-json/jwt-auth/v1/token',{
         method: "POST",
@@ -159,6 +161,7 @@ class App extends React.Component {
                 <Route path="/" exact component={HomePage} />
                 <Route path="/interviews" exact component={InterviewsGrid} />
                 <Route path="/candidates" exact component={CandidatesGrid} />
+                <Route path="/interviewers" exact component={InterviewersGrid} />
               </Switch>
             
             <div className={classes.tableContainer}>

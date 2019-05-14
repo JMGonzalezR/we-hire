@@ -98,6 +98,12 @@ class LeftPanel extends React.Component {
               </ListItemIcon>
               <Link to="/candidates"><ListItemText primary="Candidates" /></Link>
             </ListItem>
+            <ListItem button>
+              <ListItemIcon>
+                <DashboardIcon />
+              </ListItemIcon>
+              <Link to="/interviewers"><ListItemText primary="Interviewers" /></Link>
+            </ListItem>
           </List>
           <Divider />
           
