@@ -4,10 +4,10 @@ import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
+import Snackbar from '@material-ui/core/Snackbar';
 import { withStyles } from '@material-ui/core/styles';
 
 
@@ -31,11 +31,13 @@ const styles = theme => ({
 class CandidateForm extends React.Component {
   state = {
     open: false,
+    openNotification: false,
     name: '',
     last_name: '',
     email: '',
     phone_number: '',
-    position: ''
+    position: '',
+    notificationMessage: ''
   };
 
   handleClickOpen = () => {
@@ -46,12 +48,54 @@ class CandidateForm extends React.Component {
     this.setState({ open: false });
   };
 
+  handleCloseNotification = () => {
+    this.setState({ openNotification: false });
+  };
+
   handleChange = name => event => {
     this.setState({ [name]: event.target.value });
   };
 
   onSubmit = () => {
-
+        let token = window.localStorage.getItem("token");
+        let {name, last_name, email, phone_number, position} = this.state;
+        let me = this;
+        fetch('http://wordpress-react-test.randomstudiosrd.com/wp-json/wp/v2/candidates',{
+            method: "POST",
+            headers:{
+                'Content-Type': 'application/json',
+                'accept': 'application/json',
+                'Authorization': 'Bearer '+token
+            },
+            body: JSON.stringify({
+                fields:{
+                    name:name,
+                    last_name:last_name,
+                    email:email,
+                    phone_number:phone_number,
+                    position:position
+                },
+                status:"publish"
+            })
+        }).then(function(response){
+            return response.json();
+        }).then(function(post){
+            console.log(post);
+            this.setState({ 
+                open: false,
+                name: '',
+                last_name: '',
+                email: '',
+                phone_number: '',
+                position: ''})
+        }).catch(function(error){
+            me.setState(
+                {
+                    notificationMessage: "There is a problem with the Fetch:" + error.message,
+                    openNotification:true
+                },
+            )
+        })
   }
 
   render() {
@@ -120,11 +164,20 @@ class CandidateForm extends React.Component {
             <Button onClick={this.handleClose} color="primary" variant="contained">
               Cancel
             </Button>
-            <Button onClick={this.handleClose} color="secondary" variant="contained">
+            <Button onClick={this.onSubmit} color="secondary" variant="contained">
               Create
             </Button>
           </DialogActions>
         </Dialog>
+        <Snackbar
+          anchorOrigin={{ vertical:'top', horizontal:'left' }}
+          open={this.state.openNotification}
+          onClose={this.handleCloseNotification}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          message={<span id="message-id">{this.state.notificationMessage}</span>}
+        />
       </div>
     );
   }
