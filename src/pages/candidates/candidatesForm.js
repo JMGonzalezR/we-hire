@@ -29,17 +29,38 @@ const styles = theme => ({
 
 
 class CandidateForm extends React.Component {
-  state = {
-    open: false,
-    openNotification: false,
-    name: '',
-    last_name: '',
-    email: '',
-    phone_number: '',
-    position: '',
-    notificationMessage: ''
-  };
+  constructor(props){
+      super(props);
+      let {name, last_name, email, phone_number, position} = props.candidate;
+      this.state = {
+        open: props.openForm,
+        openNotification: false,
+        name,
+        last_name,
+        email,
+        phone_number,
+        position,
+        notificationMessage: '',
+        candidateId: props.candidateId
+      };
+  }
 
+  static getDerivedStateFromProps(nextProps, prevState) {
+    let {name, last_name, email, phone_number, position} = nextProps.candidate;
+    if (prevState.open !== nextProps.openForm) {
+        return {
+            open: nextProps.openForm,
+            name,
+            last_name,
+            email,
+            phone_number,
+            position,
+            candidateId: nextProps.candidateId
+        }
+    }
+    return null;
+    }
+  
   handleClickOpen = () => {
     this.setState({ open: true });
   };
@@ -58,9 +79,11 @@ class CandidateForm extends React.Component {
 
   onSubmit = () => {
         let token = window.localStorage.getItem("token");
-        let {name, last_name, email, phone_number, position} = this.state;
+        let {name, last_name, email, phone_number, position,candidateId} = this.state;
         let me = this;
-        fetch('http://wordpress-react-test.randomstudiosrd.com/wp-json/wp/v2/candidates',{
+        let id ='';
+        if(candidateId) id = candidateId;
+        fetch('http://wordpress-react-test.randomstudiosrd.com/wp-json/wp/v2/candidates/' +id,{
             method: "POST",
             headers:{
                 'Content-Type': 'application/json',
@@ -81,13 +104,17 @@ class CandidateForm extends React.Component {
             return response.json();
         }).then(function(post){
             console.log(post);
-            this.setState({ 
-                open: false,
+            me.setState({ 
                 name: '',
                 last_name: '',
                 email: '',
                 phone_number: '',
-                position: ''})
+                position: '',
+                notificationMessage: "Candidate Created!",
+                openNotification:true
+                })
+            me.props.fetchCandidates();
+            me.props.onCloseForm();
         }).catch(function(error){
             me.setState(
                 {
@@ -102,12 +129,12 @@ class CandidateForm extends React.Component {
     const {classes} = this.props;
     return (
       <div>
-        <Fab color="primary" aria-label="Add" className={classes.fab} onClick={this.handleClickOpen}> 
+        <Fab color="primary" aria-label="Add" className={classes.fab} onClick={this.props.onOpenForm}> 
             <AddIcon />
         </Fab>
         <Dialog
           open={this.state.open}
-          onClose={this.handleClose}
+          onClose={this.props.onCloseForm}
           aria-labelledby="form-dialog-title"
           disableBackdropClick
           disableEscapeKeyDown
@@ -161,11 +188,11 @@ class CandidateForm extends React.Component {
             
           </DialogContent>
           <DialogActions className={classes.dialogActions}>
-            <Button onClick={this.handleClose} color="primary" variant="contained">
+            <Button onClick={this.props.onCloseForm} color="primary" variant="contained">
               Cancel
             </Button>
             <Button onClick={this.onSubmit} color="secondary" variant="contained">
-              Create
+              {this.state.candidateId === undefined ? "Create" : "Update"}
             </Button>
           </DialogActions>
         </Dialog>

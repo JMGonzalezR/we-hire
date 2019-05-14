@@ -68,9 +68,15 @@ class CandidatesGrid extends React.Component {
     data: [],
     page: 0,
     rowsPerPage: 5,
+    dataSelected:{},
+    openForm: false
   };
 
   componentDidMount(){
+    this.fetchCandidates();
+  }
+
+  fetchCandidates = () => {
     let dataURL = "http://wordpress-react-test.randomstudiosrd.com/wp-json/acf/v3/candidates"  
     fetch(dataURL)
         .then(res => res.json())
@@ -101,25 +107,22 @@ class CandidatesGrid extends React.Component {
     this.setState({ selected: [] });
   };
 
-  handleClick = (event, id) => {
-    const { selected } = this.state;
+  handleClick = (event, id, data) => {
+    const { selected, dataSelected } = this.state;
     const selectedIndex = selected.indexOf(id);
     let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
+    let newDataSelected = {};
+    //If you click in the row selected, it will remove it from selected
+    if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
+    } 
+    else newSelected = [id];
+
+    if(dataSelected !== data){
+        newDataSelected = data;
     }
 
-    this.setState({ selected: newSelected });
+    this.setState({ selected: newSelected, dataSelected: newDataSelected });
   };
 
   handleChangePage = (event, page) => {
@@ -132,16 +135,51 @@ class CandidatesGrid extends React.Component {
 
   isSelected = id => this.state.selected.indexOf(id) !== -1;
 
+  onDelete = () =>{
+    let token = window.localStorage.getItem("token");
+    let id = this.state.selected[0];
+    let me = this;
+    fetch('http://wordpress-react-test.randomstudiosrd.com/wp-json/wp/v2/candidates/'+id ,{
+        method: "DELETE",
+        headers:{
+            'Content-Type': 'application/json',
+            'accept': 'application/json',
+            'Authorization': 'Bearer '+token
+        },
+        body: JSON.stringify({
+            id
+        })
+    }).then(function(response){
+        return response.json();
+    }).then(function(post){
+        console.log(post);
+        me.setState({ 
+            selected:[]
+            })
+        me.fetchCandidates();
+    }).catch(function(error){
+        console.log(error.message)
+    })
+  }
+
+  onEdit = () =>{
+        this.setState({openForm:true})
+  }
+
+  onCloseForm = () =>{
+    this.setState({openForm:false, selected:[], dataSelected:{}})
+  }
+
   render() {
     const { classes } = this.props;
-    const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
+    const { data, order, orderBy, selected, rowsPerPage, page, openForm } = this.state;
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
-   console.log(data);
+    const id = selected[0];
     return (
       <Paper className={classes.root}>
         
-        <EnhancedTableToolbar numSelected={selected.length} title="Candidates" />
-        <CandidateForm/>
+        <EnhancedTableToolbar numSelected={selected.length} title="Candidates" onDelete={this.onDelete} onEdit={this.onEdit} />
+        <CandidateForm fetchCandidates={this.fetchCandidates} candidate={this.state.dataSelected} onOpenForm={this.onEdit} openForm={openForm} candidateId={id} onCloseForm={this.onCloseForm}/>
         <div className={classes.tableWrapper}>
           <Table className={classes.table} aria-labelledby="tableTitle">
             <EnhancedTableHead
@@ -161,7 +199,7 @@ class CandidatesGrid extends React.Component {
                   return (
                     <TableRow
                       hover
-                      onClick={event => this.handleClick(event, n.id)}
+                      onClick={event => this.handleClick(event, n.id, n.acf)}
                       role="checkbox"
                       aria-checked={isSelected}
                       tabIndex={-1}

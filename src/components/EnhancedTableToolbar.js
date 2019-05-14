@@ -9,6 +9,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
+import Button from '@material-ui/core/Button';
 
 const toolbarStyles = theme => ({
     root: {
@@ -33,6 +34,9 @@ const toolbarStyles = theme => ({
     title: {
       flex: '0 0 auto',
     },
+    buttonsContainer:{
+      display:'flex'
+    }
   });
   
   let EnhancedTableToolbar = props => {
@@ -45,24 +49,23 @@ const toolbarStyles = theme => ({
         })}
       >
         <div className={classes.title}>
-          {numSelected > 0 ? (
-            <Typography color="inherit" variant="subtitle1">
-              {numSelected} selected
-            </Typography>
-          ) : (
+          
             <Typography variant="h6" id="tableTitle">
               {title}
             </Typography>
-          )}
+          
         </div>
         <div className={classes.spacer} />
         <div className={classes.actions}>
           {numSelected > 0 ? (
-            <Tooltip title="Delete">
-              <IconButton aria-label="Delete">
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
+            <div className={classes.buttonsContainer}>
+              <Button variant="contained" color="primary" onClick={props.onEdit}>Edit</Button>
+              <Tooltip title="Delete">
+                <IconButton aria-label="Delete" onClick={props.onDelete}>
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            </div>
           ) : (
             <Tooltip title="Filter list">
               <IconButton aria-label="Filter list">
