@@ -142,7 +142,7 @@ class App extends React.Component {
               noWrap
               className={classes.title}
             >
-              Dashboard
+              We Hire!
             </Typography>
             <IconButton color="inherit">
               <Badge badgeContent={4} color="secondary">

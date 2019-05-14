@@ -41,6 +41,10 @@ const styles = theme => ({
     [theme.breakpoints.up('sm')]: {
       width: theme.spacing.unit * 9,
     },
+  },
+  link:{
+    padding: '0 16px',
+    textDecoration: 'none'
   }
 });
 
@@ -84,25 +88,25 @@ class LeftPanel extends React.Component {
               <ListItemIcon>
                 <DashboardIcon />
               </ListItemIcon>
-              <Link to="/"><ListItemText primary="Dashboard" /></Link>
+              <Link className={classes.link} to="/"><ListItemText primary="Dashboard" /></Link>
             </ListItem>
             <ListItem button>
               <ListItemIcon>
                 <DashboardIcon />
               </ListItemIcon>
-              <Link to="/interviews"><ListItemText primary="Interviews" /></Link>
+              <Link className={classes.link} to="/interviews"><ListItemText primary="Interviews" /></Link>
             </ListItem>
             <ListItem button>
               <ListItemIcon>
                 <DashboardIcon />
               </ListItemIcon>
-              <Link to="/candidates"><ListItemText primary="Candidates" /></Link>
+              <Link className={classes.link} to="/candidates"><ListItemText primary="Candidates" /></Link>
             </ListItem>
             <ListItem button>
               <ListItemIcon>
                 <DashboardIcon />
               </ListItemIcon>
-              <Link to="/interviewers"><ListItemText primary="Interviewers" /></Link>
+              <Link className={classes.link} to="/interviewers"><ListItemText primary="Interviewers" /></Link>
             </ListItem>
           </List>
           <Divider />
